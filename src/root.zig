@@ -1,30 +1,29 @@
 const std = @import("std");
-const Io = std.Io;
+
 pub const Jsonc = @import("jsonc.zig");
-pub const tokenizer = @import("tokenizer.zig");
-
-/// This is a documentation comment to explain the `printAnotherMessage` function below.
-///
-/// Accepting an `Io.Writer` instance is a handy way to write reusable code.
-pub fn printAnotherMessage(writer: *Io.Writer) Io.Writer.Error!void {
-    try writer.print("Run `zig build test` to run the tests.\n", .{});
-}
-
-pub fn add(a: i32, b: i32) i32 {
-    return a + b;
-}
-
-test "basic add functionality" {
-    try std.testing.expect(add(3, 7) == 10);
-}
-
-test "Jsonc init/deinit" {
-    const text = "Hello world!";
-    const allocator = std.testing.allocator;
-    var jsonc = try Jsonc.init(allocator, text);
-    defer jsonc.deinit();
-}
+const tokenizer = @import("tokenizer.zig");
+const parser = @import("parser.zig");
 
 test {
     std.testing.refAllDecls(@This());
+}
+
+const testing = std.testing;
+test "object key-value pair with line_comment" {
+    const allocator = testing.allocator;
+    const src =
+        \\ {
+        \\  // This is comment
+        \\  "key": "value"
+        \\ }
+    ;
+
+    var jsonc = Jsonc.init(src);
+    defer jsonc.deinit();
+
+    const parsed = try jsonc.parse(std.json.Value, allocator, .{});
+    defer parsed.deinit();
+
+    try testing.expect(parsed.value == .object);
+    try testing.expectEqualStrings("value", parsed.value.object.get("key").?.string);
 }

@@ -1,41 +1,8 @@
 const std = @import("std");
+const Token = @import("Token.zig");
+const TokenKind = @import("Token.zig").TokenKind;
 
-pub const TokenKind = enum {
-    lbrace, // {
-    rbrace, // }
-    lbracket, // [
-    rbracket, // ]
-    colon, // :
-    comma, // ,
-
-    // values
-    string,
-    number,
-    true,
-    false,
-    null,
-
-    // comment
-    line_comment, // //...
-
-    whitespace,
-    newline,
-
-    eof,
-    invalid,
-};
-
-pub const Token = struct {
-    kind: TokenKind,
-    start: u32,
-    end: u32,
-
-    pub fn slice(self: Token, src: []const u8) []const u8 {
-        return src[self.start..self.end];
-    }
-};
-
-fn tokenize(allocator: std.mem.Allocator, src: []const u8) ![]Token {
+pub fn tokenize(allocator: std.mem.Allocator, src: []const u8) ![]Token {
     var list = std.ArrayList(Token){};
     defer list.deinit(allocator);
 
@@ -286,7 +253,7 @@ test "key-value pair" {
 }
 
 test "number array" {
-    const src = "[1, 2, 3]";
+    const src = "[2, 2, 3]";
     const allocator = testing.allocator;
 
     const result = try tokenize(allocator, src);
