@@ -1,6 +1,7 @@
 const std = @import("std");
 const Io = std.Io;
 pub const Jsonc = @import("jsonc.zig");
+pub const tokenizer = @import("tokenizer.zig");
 
 /// This is a documentation comment to explain the `printAnotherMessage` function below.
 ///
@@ -22,4 +23,8 @@ test "Jsonc init/deinit" {
     const allocator = std.testing.allocator;
     var jsonc = try Jsonc.init(allocator, text);
     defer jsonc.deinit();
+}
+
+test {
+    std.testing.refAllDecls(@This());
 }
