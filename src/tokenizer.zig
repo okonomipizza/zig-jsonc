@@ -1,6 +1,7 @@
 const std = @import("std");
 const Token = @import("Token.zig");
 const TokenKind = @import("Token.zig").TokenKind;
+const JsoncError = @import("error.zig").JsoncError;
 
 pub fn tokenize(allocator: std.mem.Allocator, src: []const u8) ![]Token {
     var list = std.ArrayList(Token){};
@@ -82,7 +83,7 @@ pub fn tokenize(allocator: std.mem.Allocator, src: []const u8) ![]Token {
                         }
                     }
                     if (!closed) {
-                        return error.InvalidComment;
+                        return JsoncError.InvalidComment;
                     }
                 } else if (std.mem.startsWith(u8, src[i..], "true")) {
                     try list.append(allocator, .{ .kind = .true, .start = @intCast(start), .end = @intCast(i + 4) });

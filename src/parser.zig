@@ -2,6 +2,7 @@ const std = @import("std");
 const tokenize = @import("tokenizer.zig").tokenize;
 const json = std.json;
 const Token = @import("Token.zig");
+const JsoncError = @import("error.zig").JsoncError;
 
 pub fn parse(comptime T: type, allocator: std.mem.Allocator, src: []const u8, tokens: []Token, option: json.ParseOptions) !json.Parsed(T) {
     const stripped = try stripComment(allocator, src, tokens);
@@ -19,7 +20,7 @@ fn stripComment(allocator: std.mem.Allocator, src: []const u8, tokens: []Token) 
         const token = tokens[i];
         switch (token.kind) {
             .line_comment, .block_comment => i += 1,
-            .invalid => return error.InvalidJson,
+            .invalid => return JsoncError.InvalidJson,
             else => {
                 const slice = src[token.start..token.end];
                 try stripped.appendSlice(allocator, slice);
