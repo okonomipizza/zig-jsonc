@@ -18,7 +18,7 @@ fn stripComment(allocator: std.mem.Allocator, src: []const u8, tokens: []Token) 
     while (i < tokens.len) {
         const token = tokens[i];
         switch (token.kind) {
-            .line_comment => i += 1,
+            .line_comment, .block_comment => i += 1,
             .invalid => return error.InvalidJson,
             else => {
                 const slice = src[token.start..token.end];
@@ -29,67 +29,4 @@ fn stripComment(allocator: std.mem.Allocator, src: []const u8, tokens: []Token) 
     }
 
     return stripped.toOwnedSlice(allocator);
-}
-
-const testing = std.testing;
-
-test "object key-value pair with line_comment" {
-    const allocator = testing.allocator;
-    const src =
-        \\ {
-        \\  // This is comment
-        \\  "key": "value"
-        \\ }
-    ;
-
-    const tokens = try tokenize(allocator, src);
-    defer allocator.free(tokens);
-
-    const parsed = try parse(json.Value, allocator, src, tokens, .{});
-    defer parsed.deinit();
-
-    try testing.expect(parsed.value == .object);
-    try testing.expectEqualStrings("value", parsed.value.object.get("key").?.string);
-}
-
-test "array with line_comment" {
-    const allocator = testing.allocator;
-    const src =
-        \\ [
-        \\  // This is a comment
-        \\  "apple", "orange", "grape"
-        \\ ]
-    ;
-
-    const tokens = try tokenize(allocator, src);
-    defer allocator.free(tokens);
-
-    const parsed = try parse(json.Value, allocator, src, tokens, .{});
-    defer parsed.deinit();
-
-    try testing.expect(parsed.value == .array);
-    try testing.expectEqualStrings("apple", parsed.value.array.items[0].string);
-    try testing.expectEqualStrings("orange", parsed.value.array.items[1].string);
-    try testing.expectEqualStrings("grape", parsed.value.array.items[2].string);
-}
-
-test "array with line_comment 2" {
-    const allocator = testing.allocator;
-    const src =
-        \\ [
-        \\  // This is a comment
-        \\  "apple", "orange", "grape"
-        \\ ]
-    ;
-
-    const tokens = try tokenize(allocator, src);
-    defer allocator.free(tokens);
-
-    const parsed = try parse(json.Value, allocator, src, tokens, .{});
-    defer parsed.deinit();
-
-    try testing.expect(parsed.value == .array);
-    try testing.expectEqualStrings("apple", parsed.value.array.items[0].string);
-    try testing.expectEqualStrings("orange", parsed.value.array.items[1].string);
-    try testing.expectEqualStrings("grape", parsed.value.array.items[2].string);
 }

@@ -17,6 +17,7 @@ pub const TokenKind = enum {
 
     // comment
     line_comment, // //...
+    block_comment, // /* .. */
 
     whitespace,
     newline,

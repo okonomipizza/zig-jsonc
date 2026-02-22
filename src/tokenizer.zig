@@ -66,6 +66,24 @@ pub fn tokenize(allocator: std.mem.Allocator, src: []const u8) ![]Token {
                     // line comment
                     while (i < src.len and src[i] != '\n') : (i += 1) {}
                     try list.append(allocator, .{ .kind = .line_comment, .start = @intCast(start), .end = @intCast(i) });
+                    // TODO Fix block comment implementation
+                } else if (char == '/' and i + 1 < src.len and src[i + 1] == '*') {
+                    // block comment
+                    i += 2;
+                    var closed = false;
+                    while (i < src.len) : (i += 1) {
+                        if (src[i] == '*' and i < src.len and src[i + 1] == '/') {
+                            i += 2;
+                            try list.append(allocator, .{ .kind = .block_comment, .start = @intCast(start), .end = @intCast(i) });
+                            closed = true;
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
+                    if (!closed) {
+                        return error.InvalidComment;
+                    }
                 } else if (std.mem.startsWith(u8, src[i..], "true")) {
                     try list.append(allocator, .{ .kind = .true, .start = @intCast(start), .end = @intCast(i + 4) });
                     i += 4;
@@ -290,4 +308,15 @@ test "newline token" {
 
     try testing.expectEqual(2, result.len);
     try testing.expectEqual(.newline, result[0].kind);
+}
+
+test "block comment" {
+    const src =
+        \\/* This is a comment */
+    ;
+    const result = try tokenize(testing.allocator, src);
+    defer testing.allocator.free(result);
+
+    try testing.expectEqual(2, result.len);
+    try testing.expectEqual(.block_comment, result[0].kind);
 }
