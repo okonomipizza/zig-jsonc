@@ -1,4 +1,4 @@
-pub const std = @import("std");
+const std = @import("std");
 pub const Jsonc = @This();
 const tokenize = @import("tokenizer.zig").tokenize;
 const parse_jsonc = @import("parser.zig").parse;
@@ -20,4 +20,41 @@ pub fn parse(self: *Jsonc, comptime T: type, allocator: std.mem.Allocator, optio
 
 pub fn deinit(self: *Jsonc) void {
     _ = self;
+}
+
+pub fn getValueByPath(root: std.json.Value, keys: []const []const u8) error{NotAnObject}!?std.json.Value {
+    if (keys.len == 0) return root;
+    if (root != .object) return error.NotAnObject;
+
+    const next = root.object.get(keys[0]) orelse return null;
+
+    if (keys.len == 1) return next;
+    return getValueByPath(next, keys[1..]);
+}
+
+test "get value by path" {
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const json_str =
+        \\{
+        \\ "user": {
+        \\   "address": {
+        \\     "city": "Tokyo"
+        \\   }
+        \\ }
+        \\}
+    ;
+
+    const parsed = try std.json.parseFromSlice(
+        std.json.Value,
+        allocator,
+        json_str,
+        .{},
+    );
+    defer parsed.deinit();
+
+    const city = try getValueByPath(parsed.value, &.{ "user", "address", "city" });
+
+    try testing.expectEqualStrings("Tokyo", city.?.string);
 }
