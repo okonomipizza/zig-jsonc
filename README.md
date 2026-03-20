@@ -64,9 +64,10 @@ test "object key-value pair with line_comment" {
     try testing.expect(parsed.value == .object);
     try testing.expectEqualStrings("value", parsed.value.object.get("key").?.string);
 }
+```
 
-We can get a value by passing key slices like below.
-Ret
+Retrieve a nested value by key path
+
 ```zig
 test "get value by path" {
     const testing = std.testing;
@@ -93,8 +94,6 @@ test "get value by path" {
 
     try testing.expectEqualStrings("Tokyo", city.?.string);
 }
-
-```
 
 const std = @import("std");
 const Jsonc = @import("jsonc").Jsonc;
