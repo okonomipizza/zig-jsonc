@@ -1,8 +1,8 @@
 .{
     .name = .jsonc,
     .version = "0.1.0",
-    .fingerprint = 0x39afb47494489b64, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.16.0-dev.2637+6a9510c0e",
+    .fingerprint = 0x646d558deae2e7, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.15.1",
     .dependencies = .{},
     .paths = .{
         "build.zig",

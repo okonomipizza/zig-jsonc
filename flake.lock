@@ -34,6 +34,27 @@
         "type": "github"
       }
     },
+    "gitignore": {
+      "inputs": {
+        "nixpkgs": [
+          "zls",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762808025,
+        "narHash": "sha256-XmjITeZNMTQXGhhww6ed/Wacy2KzD6svioyCX7pkUu4=",
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix",
+        "rev": "cb5e3fdca1de58ccbc3ef53de65bd372b48f567c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1771369470,
@@ -113,6 +134,7 @@
     },
     "zls": {
       "inputs": {
+        "gitignore": "gitignore",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -121,15 +143,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1771713029,
-        "narHash": "sha256-hJKGEM9FPjxypRIOnIGHhVs3cdBw1mnHPG6iEG9LG80=",
+        "lastModified": 1764896432,
+        "narHash": "sha256-6IkRtQkn+qUHDz00QvCV/rb2yuF6xWEXug41CD8LLw8=",
         "owner": "zigtools",
         "repo": "zls",
-        "rev": "f0a28cfbea9fa1ac9641877b1e47997461a11ae0",
+        "rev": "f91b2e1e305e5d5bd3725aea90f9f9bfb3dce055",
         "type": "github"
       },
       "original": {
         "owner": "zigtools",
+        "ref": "0.15.1",
         "repo": "zls",
         "type": "github"
       }
