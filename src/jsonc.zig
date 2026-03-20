@@ -22,6 +22,8 @@ pub fn deinit(self: *Jsonc) void {
     _ = self;
 }
 
+/// Retrieves a JSON value by traversing a path of keys (e.g. &.{"user", "address", "city"}).
+/// Returns null if any key is not found, or an error if a non-object is encountered mid-path.
 pub fn getValueByPath(root: std.json.Value, keys: []const []const u8) error{NotAnObject}!?std.json.Value {
     if (keys.len == 0) return root;
     if (root != .object) return error.NotAnObject;
@@ -57,4 +59,31 @@ test "get value by path" {
     const city = try getValueByPath(parsed.value, &.{ "user", "address", "city" });
 
     try testing.expectEqualStrings("Tokyo", city.?.string);
+}
+
+test "Null result" {
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const json_str =
+        \\{
+        \\ "user": {
+        \\   "address": {
+        \\     "city": "Tokyo"
+        \\   }
+        \\ }
+        \\}
+    ;
+
+    const parsed = try std.json.parseFromSlice(
+        std.json.Value,
+        allocator,
+        json_str,
+        .{},
+    );
+    defer parsed.deinit();
+
+    const maybe_town = try getValueByPath(parsed.value, &.{ "user", "address", "town" });
+
+    try testing.expectEqual(null, maybe_town);
 }

@@ -65,6 +65,37 @@ test "object key-value pair with line_comment" {
     try testing.expectEqualStrings("value", parsed.value.object.get("key").?.string);
 }
 
+We can get a value by passing key slices like below.
+Ret
+```zig
+test "get value by path" {
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const src =
+        \\{
+        \\ "user": {
+        \\   "address": {
+        \\     "city": "Tokyo"
+        \\   }
+        \\ }
+        \\}
+    ;
+
+
+    var jsonc = Jsonc.init(src);
+    defer jsonc.deinit();
+
+    const parsed = try jsonc.parse(std.json.Value, allocator, .{});
+    defer parsed.deinit();
+
+    const city = try Jsonc.getValueByPath(parsed.value, &.{ "user", "address", "city" });
+
+    try testing.expectEqualStrings("Tokyo", city.?.string);
+}
+
+```
+
 const std = @import("std");
 const Jsonc = @import("jsonc").Jsonc;
 ```
